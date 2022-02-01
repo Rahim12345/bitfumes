@@ -2,7 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Faker;
 
 class ReviewFactory extends Factory
 {
@@ -13,8 +15,14 @@ class ReviewFactory extends Factory
      */
     public function definition()
     {
+        $faker = Faker\Factory::create();
         return [
-            //
+            'product_id'=>function(){
+                return Product::all()->random();
+            },
+            'customer'=>$faker->name,
+            'review'=>$faker->paragraph,
+            'star'=>$faker->numberBetween(1,5)
         ];
     }
 }
