@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class UpdateProductRequest extends FormRequest
 {
@@ -13,7 +16,7 @@ class UpdateProductRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,10 +24,17 @@ class UpdateProductRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(Request $request)
     {
+        $request['id'] = collect(request()->segments())->last();
         return [
-            //
+            'name'=>['required','max:255',Rule::unique('products','name')->where(function ($query) use ($request) {
+                return $query->where('id','!=',$request->id);
+            })],
+            'detail'=>'required',
+            'price'=>'required|max:10',
+            'stock'=>'required|max:6',
+            'discount'=>'required|max:2'
         ];
     }
 }

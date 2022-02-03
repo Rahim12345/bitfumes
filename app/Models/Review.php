@@ -17,4 +17,9 @@ class Review extends Model
       'review',
       'star'
     ];
+
+    public function product()
+    {
+        return $this->hasOne(Product::class,'id','product_id');
+    }
 }

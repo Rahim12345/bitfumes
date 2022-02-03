@@ -2,12 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\Product\ProductCollection;
+use App\Http\Resources\Product\ProductResource;
 use App\Models\Product;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api')->except('index', 'show');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -15,7 +22,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        //
+        return ProductCollection::collection(Product::paginate(5));
     }
 
     /**
@@ -36,7 +43,17 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
-        //
+        $product = Product::create([
+           'name'=>$request->name,
+           'detail'=>$request->detail,
+           'price'=>$request->price,
+           'stock'=>$request->stock,
+           'discount'=>$request->discount
+        ]);
+
+        return response()->json([
+           'data'=>new ProductResource($product)
+        ],Response::HTTP_CREATED);
     }
 
     /**
@@ -47,7 +64,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        //
+        return new ProductResource($product);
     }
 
     /**
@@ -70,7 +87,17 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        //
+        $product->update([
+            'name'=>$request->name,
+            'detail'=>$request->detail,
+            'price'=>$request->price,
+            'stock'=>$request->stock,
+            'discount'=>$request->discount
+        ]);
+
+        return response()->json([
+            'data'=>new ProductResource($product)
+        ],Response::HTTP_CREATED);
     }
 
     /**
@@ -81,6 +108,8 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
+        $product->delete();
+
+        return response()->json(null,Response::HTTP_NO_CONTENT);
     }
 }
